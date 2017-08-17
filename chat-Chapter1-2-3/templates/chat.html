@@ -33,7 +33,7 @@
       if (!window["WebSocket"]) {
         alert("Error: WebSocketに対応していないブラウザです。");
       } else {
-        socket = new WebSocket("ws://localhost:8080/room");
+        socket = new WebSocket("ws://{{.Host}}/room"); // http.Request.Hostの値に置き換える
         socket.onclose = function() {
           alert("接続が終了しました。");
         }
