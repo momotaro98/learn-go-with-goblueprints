@@ -4,12 +4,11 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
+	// "os"
 	"path/filepath"
 	"sync"
 	"text/template"
-
-	"github.com/momotaro98/learn-go-with-goblueprints/trace"
+	// "github.com/momotaro98/learn-go-with-goblueprints/trace"
 )
 
 // templは1つのテンプレートを表す
@@ -35,7 +34,7 @@ func main() {
 	var addr = flag.String("addr", ":8080", "Address of the application")
 	flag.Parse() // 入力された文字列の値を*addrへセットする。
 	r := newRoom()
-	r.tracer = trace.New(os.Stdout)
+	// r.tracer = trace.New(os.Stdout)
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 	// チャットルームを開始

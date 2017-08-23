@@ -25,3 +25,14 @@ func (t *tracer) Trace(a ...interface{}) {
 	t.out.Write([]byte(fmt.Sprint(a...)))
 	t.out.Write([]byte("\n"))
 }
+
+// nilTracer implements Tracer that does nothing
+type nilTracer struct{}
+
+// Off returns nilTracer
+func Off() Tracer {
+	return &nilTracer{}
+}
+
+// Trace is a method nilTracer has
+func (t *nilTracer) Trace(a ...interface{}) {}
