@@ -31,11 +31,11 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var addr = flag.String("addr", ":8080", "Address of the application")
+	var addr = flag.String("host", ":8080", "Address of the application")
 	flag.Parse() // 入力された文字列の値を*addrへセットする。
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/room", r)
 	// チャットルームを開始
 	go r.run()
