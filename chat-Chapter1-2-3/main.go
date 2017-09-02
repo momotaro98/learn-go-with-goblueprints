@@ -4,11 +4,16 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	// "os"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
 	// "github.com/momotaro98/learn-go-with-goblueprints/trace"
+
+	"github.com/stretchr/gomniauth"
+	// "github.com/stretchr/gomniauth/providers/facebook"
+	// "github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/gomniauth/providers/google"
 )
 
 // templは1つのテンプレートを表す
@@ -33,6 +38,15 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	var addr = flag.String("host", ":8080", "Address of the application")
 	flag.Parse() // 入力された文字列の値を*addrへセットする。
+	// Gomniauthのセットアップ
+	gomniauth.SetSecurityKey("momotaro98") // クライアントサーバー間のデジタル署名のために必要。ランダムな値を設定しておくこと。
+	gomniauth.WithProviders(
+		// facebook.New(),
+		// github.New(),
+		google.New(os.Getenv("GOBLUEPRINT_GOOGLE_CLIENTID"),
+			os.Getenv("GOBLUEPRINT_GOOGLE_SECRET"),
+			"http://localhost:8080/auth/callback/goolge"),
+	)
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
