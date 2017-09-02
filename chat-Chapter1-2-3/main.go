@@ -45,7 +45,7 @@ func main() {
 		// github.New(),
 		google.New(os.Getenv("GOBLUEPRINT_GOOGLE_CLIENTID"),
 			os.Getenv("GOBLUEPRINT_GOOGLE_SECRET"),
-			"http://localhost:8080/auth/callback/goolge"),
+			"http://localhost:8080/auth/callback/google"),
 	)
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
