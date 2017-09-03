@@ -27,7 +27,7 @@
           alert("Error!: WebSocket接続が行われていません。");
           return false;
         }
-        socket.send(msgBox.val());
+        socket.send(JSON.stringify({"Message": msgBox.val()}));
         msgBox.val("");
         return false;
       });
@@ -39,8 +39,25 @@
           alert("接続が終了しました。");
         }
         socket.onmessage = function(e) {
-          messages.append($("<li>").text(e.data));
+          var msg = JSON.parse(e.data);
+          messages.append(
+            $("<li>").append(
+              $("<span>").text(myDateParse(msg.When) + " "),
+              $("<strong>").text(msg.Name + ": "),
+              $("<span>").text(msg.Message)
+            )
+          );
         }
+      }
+
+      function myDateParse(dateString) {
+        var year = dateString.slice(0, 4);
+        var month = dateString.slice(5, 7);
+        var day = dateString.slice(8, 10);
+        var hour = dateString.slice(11, 13);
+        var minute = dateString.slice(14, 16);
+
+        return year + "/" + month + "/" + day + " " + hour + ":" + minute;
       }
     });
   </script>
