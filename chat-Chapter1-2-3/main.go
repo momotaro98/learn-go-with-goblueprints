@@ -17,6 +17,12 @@ import (
 	"github.com/stretchr/gomniauth/providers/google"
 )
 
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatarAvatar,
+}
+
 // templは1つのテンプレートを表す
 type templateHandler struct {
 	once     sync.Once
@@ -55,9 +61,7 @@ func main() {
 			os.Getenv("GOBLUEPRINT_GOOGLE_SECRET"),
 			"http://localhost:8080/auth/callback/google"),
 	)
-	// r := newRoom(UseAuthAvatar)
-	// r := newRoom(UseGravatarAvatar)
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
