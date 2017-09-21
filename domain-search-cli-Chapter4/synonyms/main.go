@@ -11,6 +11,10 @@ import (
 
 func main() {
 	apiKey := os.Getenv("BHT_APIKEY")
+	if apiKey == "" {
+		log.Fatalln("Failed to get ENVIRONMENT VAR, 'BHT_APIKEY'")
+		return
+	}
 	thesaurus := &thesaurus.BigHugh{APIKey: apiKey}
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
