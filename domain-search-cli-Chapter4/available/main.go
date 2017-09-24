@@ -1,10 +1,32 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"net"
+	"os"
+	"strings"
+	"time"
 )
 
-func exsists(domain string) (bool, error) {
+var marks = map[bool]string{true: "OK", false: "NG"}
+
+func main() {
+	s := bufio.NewScanner(os.Stdin)
+	for s.Scan() {
+		domain := s.Text()
+		fmt.Print(domain, " ")
+		exist, err := exists(domain)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(marks[!exist])
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func exists(domain string) (bool, error) {
 	const whoisServer string = "com.whois-servers.net"
 	conn, err := net.Dial("tcp", whoisServer+":43")
 	if err != nil {
