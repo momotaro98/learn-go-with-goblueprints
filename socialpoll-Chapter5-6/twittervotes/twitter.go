@@ -133,3 +133,25 @@ func readFromTwitter(votes chan<- string) {
 		}
 	}
 }
+
+func startTwitterStream(stopchan <-chan struct{}, votes chan<- string) <-chan struct{} {
+	stoppedchan := make(chan struct{}, 1)
+	go func() {
+		defer func() {
+			stoppedchan <- struct{}{}
+		}()
+		for {
+			select {
+			case <-stopchan:
+				log.Println("Finishing querying to Twitter...")
+				return
+			default:
+				log.Println("Starting querying to Twitter...")
+				readFromTwitter(votes)
+				log.Println(" (Waiting) ")
+				time.Sleep(10 * time.Second)
+			}
+		}
+	}()
+	return stoppedchan
+}
