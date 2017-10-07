@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/bitly/go-nsq"
+
 	"gopkg.in/mgo.v2"
 )
 
@@ -33,6 +35,21 @@ func loadOptions() ([]string, error) {
 	}
 	iter.Close()
 	return options, iter.Err()
+}
+
+func publishVotes(votes <-chan string) <-chan struct{} {
+	stopchan := make(chan struct{}, 1)
+	pub, _ := nsq.NewProducer("localhost:4150", nsq.NewConfig())
+	go func() {
+		for vote := range votes {
+			pub.Publish("votes", []byte(vote)) // 投票内容をパブリッシュする
+		}
+		log.Println("Publisher: Stopping")
+		pub.Stop()
+		log.Println("Publisher: Stopped")
+		stopchan <- struct{}{}
+	}()
+	return stopchan
 }
 
 func main() {}
