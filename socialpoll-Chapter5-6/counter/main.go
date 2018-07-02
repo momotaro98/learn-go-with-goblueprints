@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -70,10 +72,17 @@ func main() {
 
 	log.Println("Waiting for votes on nsq...")
 	ticker := time.NewTicker(updateDuration)
+	termChan := make(chan os.Signal, 1)
+	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	for {
 		select {
 		case <-ticker.C:
 			doCount(&countsLock, &counts, pollData)
+		case <-termChan: // If Crtl + C is pressed, termChan get notify
+			ticker.Stop()
+			q.Stop()
+		case <-q.StopChan:
+			return
 		}
 	}
 }
