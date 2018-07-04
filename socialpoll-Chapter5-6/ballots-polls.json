@@ -1,0 +1,10 @@
+{
+    "options" : [
+        "happy", "sad", "fail", "win"
+    ],
+    "results" : {
+        "fail" : 159, "win" : 711,
+        "happy" : 233, "sad" : 166
+    },
+    "title" : "How do you feel like?"
+}
