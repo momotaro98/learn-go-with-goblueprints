@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	// "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -37,11 +37,45 @@ func (s *Server) handlePolls(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePollsGet(w http.ResponseWriter, r *http.Request) {
-	respondErr(w, r, http.StatusInternalServerError, errors.New("Not implemented"))
+	session := s.db.Copy()
+	defer session.Close()
+	c := session.DB("ballots").C("polls")
+	var q *mgo.Query
+	p := NewPath(r.URL.Path)
+	if p.HasID() {
+		// get specific poll
+		q = c.FindId(bson.ObjectIdHex(p.ID))
+	} else {
+		// get all polls
+		q = c.Find(nil)
+	}
+	var result []*poll
+	if err := q.All(&result); err != nil {
+		respondErr(w, r, http.StatusInternalServerError, err)
+		return
+	}
+	respond(w, r, http.StatusOK, &result)
 }
 
 func (s *Server) handlePollsPost(w http.ResponseWriter, r *http.Request) {
-	respondErr(w, r, http.StatusInternalServerError, errors.New("Not implemented"))
+	session := s.db.Copy()
+	defer session.Close()
+	c := session.DB("ballots").C("polls")
+	var p poll
+	if err := decodeBody(r, &p); err != nil {
+		respondErr(w, r, http.StatusBadRequest, "failed to read poll from request", err)
+		return
+	}
+	apikey, ok := APIKey(r.Context())
+	if ok {
+		p.APIKey = apikey
+	}
+	if err := c.Insert(p); err != nil {
+		respondErr(w, r, http.StatusInternalServerError, "failed to insert poll", err)
+		return
+	}
+	w.Header().Set("Location", "polls/"+p.ID.Hex())
+	respond(w, r, http.StatusCreated, nil)
 }
 
 func (s *Server) handlePollsDelete(w http.ResponseWriter, r *http.Request) {

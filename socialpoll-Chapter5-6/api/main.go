@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"gopkg.in/mgo.v2"
 	"log"
@@ -41,6 +42,21 @@ func withCORS(fn http.HandlerFunc) http.HandlerFunc {
 		w.Header().Set("Access-Control-Expose-Headers", "Location")
 		fn(w, r)
 	}
+}
+
+type contextKey struct {
+	name string
+}
+
+var contextKeyAPIKey = &contextKey{"api-key"}
+
+func APIKey(ctx context.Context) (string, bool) {
+	key := ctx.Value(contextKeyAPIKey)
+	if key == nil {
+		return "", false
+	}
+	keystr, ok := key.(string)
+	return keystr, ok
 }
 
 // withAPIKey wraps HandlerFunc
