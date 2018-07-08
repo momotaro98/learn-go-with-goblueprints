@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"net/http"
 
 	"gopkg.in/mgo.v2"
@@ -79,5 +78,16 @@ func (s *Server) handlePollsPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePollsDelete(w http.ResponseWriter, r *http.Request) {
-	respondErr(w, r, http.StatusInternalServerError, errors.New("Not implemented"))
+	session := s.db.Copy()
+	defer session.Close()
+	c := session.DB("ballots").C("polls")
+	p := NewPath(r.URL.Path)
+	if !p.HasID() {
+		respondErr(w, r, http.StatusMethodNotAllowed, "Cannot delete all polls.")
+		return
+	}
+	if err := c.RemoveId(bson.ObjectIdHex(p.ID)); err != nil {
+		respondErr(w, r, http.StatusInternalServerError, "failed to delete poll", err)
+	}
+	respond(w, r, http.StatusOK, nil) // ok
 }
