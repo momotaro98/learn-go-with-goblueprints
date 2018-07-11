@@ -1,5 +1,7 @@
 package meander
 
+var APIKey string
+
 // Place represents a single place.
 type Place struct {
 	*googleGeometry `json:"geometry"`

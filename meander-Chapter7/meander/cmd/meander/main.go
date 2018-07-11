@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// meander.APIKey = "TODO"
+	meander.APIKey = "YOUR API KEY HERE" // TODO: set API key by env var
 	http.HandleFunc("/journeys", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, r, meander.Journeys)
 	})
