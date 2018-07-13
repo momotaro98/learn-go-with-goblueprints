@@ -1,5 +1,7 @@
 package meander
 
+// APIKey is the Google Places API key that will be used
+// to make requests to the service.
 var APIKey string
 
 // Place represents a single place.
@@ -21,6 +23,43 @@ func (p *Place) Public() interface{} {
 		"lat":      p.Lat,
 		"lng":      p.Lng,
 	}
+}
+
+// Query represents a runnable Query against the
+// Google Places API.
+type Query struct {
+	Lat          float64
+	Lng          float64
+	Journey      []string
+	Radius       int
+	CostRangeStr string
+}
+
+func (q *Query) find(types string) (*googleResponse, error) {
+	u := "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+	vals := make(url.Values)
+	vals.Set("location", fmt.Sprintf("%g,%g", q.Lat, q.Lng))
+	vals.Set("radius", fmt.Sprintf("%d", q.Radius))
+	vals.Set("types", types)
+	vals.Set("key", APIKey)
+	if len(q.CostRangeStr) > 0 {
+		r, err := ParseCostRange(q.CostRangeStr)
+		if err != nil {
+			return nil, err
+		}
+		vals.Set("minprice", fmt.Sprintf("%d", int(r.From)-1))
+		vals.Set("maxprice", fmt.Sprintf("%d", int(r.To)-1))
+	}
+	res, err := http.Get(u + "?" + vals.Encode())
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	var response googleResponse
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	return &response, nil
 }
 
 type googleResponse struct {

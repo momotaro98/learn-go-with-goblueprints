@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/momotaro98/learn-go-with-goblueprints/meander-Chapter7/meander"
 )
 
 func main() {
-	meander.APIKey = "YOUR API KEY HERE" // TODO: set API key by env var
+	meander.APIKey = os.Getenv("GOBLUE_GOOGLE_PLACE_API")
 	http.HandleFunc("/journeys", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, r, meander.Journeys)
 	})
