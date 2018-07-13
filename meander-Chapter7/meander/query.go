@@ -1,5 +1,16 @@
 package meander
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"math/rand"
+	"net/http"
+	"net/url"
+	"sync"
+	"time"
+)
+
 // APIKey is the Google Places API key that will be used
 // to make requests to the service.
 var APIKey string
@@ -60,6 +71,41 @@ func (q *Query) find(types string) (*googleResponse, error) {
 		return nil, err
 	}
 	return &response, nil
+}
+
+// Run runs the query concurrently, and returns the results.
+func (q *Query) Run() []interface{} {
+	rand.Seed(time.Now().UnixNano())
+	var w sync.WaitGroup
+	var l sync.Mutex // protects places
+	places := make([]interface{}, len(q.Journey))
+	for i, r := range q.Journey {
+		w.Add(1)
+		go func(types string, i int) {
+			defer w.Done()
+			response, err := q.find(types)
+			if err != nil {
+				log.Println("Failed to find places:", err)
+				return
+			}
+			if len(response.Results) == 0 {
+				log.Println("No places found for", types)
+				return
+			}
+			for _, result := range response.Results {
+				for _, photo := range result.Photos {
+					photo.URL = "https://maps.googleapis.com/maps/api/place/photo?" +
+						"maxwidth=1000&photoreference=" + photo.PhotoRef + "&key=" + APIKey
+				}
+			}
+			randI := rand.Intn(len(response.Results))
+			l.Lock()
+			places[i] = response.Results[randI]
+			l.Unlock()
+		}(r, i)
+	}
+	w.Wait()
+	return places
 }
 
 type googleResponse struct {
