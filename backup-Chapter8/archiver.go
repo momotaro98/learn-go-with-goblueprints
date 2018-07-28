@@ -2,6 +2,7 @@ package backup
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -9,10 +10,17 @@ import (
 
 // Archiver represents type capable of archiving
 type Archiver interface {
+	DestFmt() func(int64) string
 	Archive(src, dest string) error
 }
 
 type zipper struct{}
+
+func (z *zipper) DestFmt() func(int64) string {
+	return func(i int64) string {
+		return fmt.Sprintf("%d.zip", i)
+	}
+}
 
 func (z *zipper) Archive(src, dest string) error {
 	if err := os.MkdirAll(filepath.Dir(dest), 0777); err != nil {
