@@ -15,6 +15,7 @@ import (
 	"github.com/momotaro98/learn-go-with-goblueprints/backup-Chapter8"
 )
 
+// path is type for filedb
 type path struct {
 	Path string
 	Hash string
@@ -55,8 +56,8 @@ func main() {
 			fatalErr = err
 			return true
 		}
-		m.Paths[path.Path] = path.Hash
-		return false // carry on
+		m.Paths[path.Path] = path.Hash // load hashes from filedb
+		return false                   // carry on
 	})
 	if fatalErr != nil {
 		return
@@ -78,5 +79,33 @@ func main() {
 			log.Printf("Stopping...")
 			return
 		}
+	}
+}
+
+func check(m *backup.Monitor, col *filedb.C) {
+	log.Println("Checking...")
+	counter, err := m.Now() // check with current hash in m.Path
+	if err != nil {
+		log.Fatalln("failed to backup:", err)
+	}
+	if counter > 0 {
+		log.Printf("	Archived %d directories\n", counter)
+		// update hashes and storing new ones into filedb
+		var path path
+		col.SelectEach(func(_ int, data []byte) (bool, []byte, bool) {
+			if err := json.Unmarshal(data, &path); err != nil {
+				log.Println("failed to unmarshal data (skipping):", err)
+				return true, data, false
+			}
+			path.Hash, _ = m.Paths[path.Path]
+			newdata, err := json.Marshal(&path)
+			if err != nil {
+				log.Println("failed to marshal data (skipping):", err)
+				return true, data, false
+			}
+			return true, newdata, false
+		})
+	} else {
+		log.Println("	No changes")
 	}
 }
