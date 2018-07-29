@@ -45,6 +45,13 @@ _testmain.go
 # External packages folder
 vendor/
 
+# goblueprints
+## Chapter 1,2,3
 chat-Chapter1-2-3/build/
 
 env_list
+
+## Chapter 8 backupd
+
+backup
+backupd
