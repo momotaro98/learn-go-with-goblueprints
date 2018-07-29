@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/matryer/filedb"
@@ -60,5 +64,19 @@ func main() {
 	if len(m.Paths) < 1 {
 		fatalErr = errors.New("no paths - use backup tool to add at least one")
 		return
+	}
+	check(m, col)
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	for {
+		select {
+		case <-time.After(*interval):
+			check(m, col)
+		case <-signalChan:
+			// stop
+			fmt.Println()
+			log.Printf("Stopping...")
+			return
+		}
 	}
 }
