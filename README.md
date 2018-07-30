@@ -118,3 +118,18 @@ This is a repo for my learning Golang.
 * フォルダー内のファイル内容が変化したことを迅速に検出するための方法
 * archive/zipパッケージによるファイルの圧縮
 * コマンドラインフラグと通常の引数の組み合わせを考慮したツールの作成
+
+# Chapter 9.  Building a Q&A Application for Google App Engine
+
+> Specifically, in this chapter, you will learn:
+
+* How to use the Google App Engine SDK for Go to build and test applications locally before deploying to the cloud
+* How to use app.yaml to configure your application
+* How Modules in Google App Engine let you independently manage the different components that make up your application
+* How the Google Cloud Datastore lets you persist and query data at scale
+* A sensible pattern for the modeling of data and working with keys in Google Cloud Datastore
+* How to use the Google App Engine Users API to authenticate people with Google accounts
+* A pattern to embed denormalized data into entities
+* How to ensure data integrity and build counters using transactions
+* Why maintaining a good line of sight in code helps improve maintainability
+* How to achieve simple HTTP routing without adding a dependency to a third-party package
