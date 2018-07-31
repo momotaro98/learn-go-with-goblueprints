@@ -6,15 +6,15 @@
 $ gcloud config set project answersapp-211814
 ```
 
-## Run app on local
+## Run a service app on local
 
 ```
 $ cd api
 $ dev_appserver.app app.yaml
 ```
 
-## Deploy app to GAE
+## Deploy services to GAE
 
 ```
-$ gcloud app deploy app.yaml
+$ gcloud app deploy dispatch.yaml default/app.yaml api/app.yaml web/app.yaml
 ```

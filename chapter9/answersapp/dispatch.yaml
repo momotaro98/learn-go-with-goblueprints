@@ -1,0 +1,8 @@
+dispatch:
+  # api service serves API
+  - url: "*/api/*"
+    service: api
+
+  # web service serves WEB contents
+  - url: "*/*"
+    service: web

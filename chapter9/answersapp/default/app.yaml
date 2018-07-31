@@ -1,5 +1,5 @@
 runtime: go
-service: api
+service: default
 api_version: go1
 
 handlers:
