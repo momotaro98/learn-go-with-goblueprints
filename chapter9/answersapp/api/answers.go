@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/log"
 )
 
 type Answer struct {
@@ -72,4 +73,22 @@ func (a *Answer) Put(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func GetAnswers(ctx context.Context, questionKey *datastore.Key) ([]*Answer, error) {
+	var answers []*Answer
+	log.Debugf(ctx, "GetAnswers for %s", questionKey)
+	answerKeys, err := datastore.NewQuery("Answer").
+		Ancestor(questionKey).
+		Order("-Score").
+		Order("-CTime").
+		GetAll(ctx, &answers)
+	if err != nil {
+		return nil, err
+	}
+	log.Debugf(ctx, "= %s", answerKeys)
+	for i, answer := range answers {
+		answer.Key = answerKeys[i]
+	}
+	return answers, nil
 }
