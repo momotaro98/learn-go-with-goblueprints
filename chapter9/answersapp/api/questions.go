@@ -12,8 +12,8 @@ import (
 type Question struct {
 	Key          *datastore.Key `json:"id" datastore:"-"`
 	CTime        time.Time      `json:"created"`
-	Question     string         `json:"question"`
-	User         UserCard       `json:"user"`
+	Question     string         `json:"question" datastore:",noindex"`
+	User         UserCard       `json:"user" datastore:",noindex"`
 	AnswersCount int            `json:"answers_count"`
 }
 
@@ -84,4 +84,19 @@ func TopQuestions(ctx context.Context) ([]*Question, error) {
 	}
 	log.Debugf(ctx, "questions: %s", questions)
 	return questions, nil
+}
+
+// QuestionCard is simple type of Question for other services.
+type QuestionCard struct {
+	Key      *datastore.Key `json:"id" datastore:",noindex"`
+	Question string         `json:"question" datastore:",noindex"`
+	User     UserCard       `json:"user" datastore:",noindex"`
+}
+
+func (q Question) Card() QuestionCard {
+	return QuestionCard{
+		Key:      q.Key,
+		Question: q.Question,
+		User:     q.User,
+	}
 }

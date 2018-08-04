@@ -10,10 +10,10 @@ import (
 )
 
 type Answer struct {
-	Key    *datastore.Key `json:"id"	datastore:"-"`
-	Answer string         `json:"answer"`
+	Key    *datastore.Key `json:"id" datastore:"-"`
+	Answer string         `json:"answer" datastore:",noindex"`
 	CTime  time.Time      `json:"created"`
-	User   UserCard       `json:"user"`
+	User   UserCard       `json:"user" datastore:",noindex"`
 	Score  int            `json:"score"`
 }
 
@@ -91,4 +91,18 @@ func GetAnswers(ctx context.Context, questionKey *datastore.Key) ([]*Answer, err
 		answer.Key = answerKeys[i]
 	}
 	return answers, nil
+}
+
+type AnswerCard struct {
+	Key    *datastore.Key `json:"id" datastore:",noindex"`
+	Answer string         `json:"answer" datastore:",noindex"`
+	User   UserCard       `json:"user" datastore:",noindex"`
+}
+
+func (a Answer) Card() AnswerCard {
+	return AnswerCard{
+		Key:    a.Key,
+		Answer: a.Answer,
+		User:   a.User,
+	}
 }
