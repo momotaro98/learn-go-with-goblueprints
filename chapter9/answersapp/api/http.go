@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"strings"
+
 	"google.golang.org/appengine/log"
 )
 
@@ -50,4 +52,17 @@ func respondErr(ctx context.Context, w http.ResponseWriter, r *http.Request, err
 	if err != nil {
 		log.Errorf(ctx, "respondErr: %s", err)
 	}
+}
+
+func pathParams(r *http.Request, pattern string) map[string]string {
+	params := map[string]string{}
+	pathSegs := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+	for i, seg := range strings.Split(strings.Trim(pattern, "/"), "/") {
+		if i > len(pathSegs)-1 {
+			return params
+		}
+		params[seg] = pathSegs[i]
+	}
+
+	return params
 }
