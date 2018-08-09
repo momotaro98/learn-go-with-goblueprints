@@ -1,0 +1,16 @@
+indexes:
+
+- kind: Question
+  properties:
+  - name: AnswersCount
+    direction: desc
+  - name: CTime
+    direction: desc
+
+- kind: Answer
+  ancestor: yes
+  properties:
+  - name: Score
+    direction: desc
+  - name: CTime
+    direction: desc
