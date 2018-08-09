@@ -42,7 +42,7 @@ func CastVote(ctx context.Context, answerKey *datastore.Key, score int) (*Vote, 
 		var err error
 		vote, err = castVoteInTransaction(ctx, answerKey, question, user, score)
 		if err != nil {
-			return nil
+			return err
 		}
 		return nil
 	}, &datastore.TransactionOptions{XG: true})
@@ -52,7 +52,11 @@ func CastVote(ctx context.Context, answerKey *datastore.Key, score int) (*Vote, 
 	return &vote, nil
 }
 
-func castVoteInTransaction(ctx context.Context, answerKey *datastore.Key, question *Question, user *User, score int) (Vote, error) {
+func castVoteInTransaction(ctx context.Context,
+	answerKey *datastore.Key,
+	question *Question,
+	user *User,
+	score int) (Vote, error) {
 	var vote Vote
 	answer, err := GetAnswer(ctx, answerKey)
 	if err != nil {
@@ -74,7 +78,8 @@ func castVoteInTransaction(ctx context.Context, answerKey *datastore.Key, questi
 			Score:    score,
 		}
 	} else {
-		// they have already voted - so we will be changing this vote
+		// they have already voted - so we will be changing
+		// this vote
 		delta = vote.Score * -1
 	}
 	delta += score

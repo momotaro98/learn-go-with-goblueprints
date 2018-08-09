@@ -75,7 +75,7 @@ func TopQuestions(ctx context.Context) ([]*Question, error) {
 		Order("-AnswersCount").
 		Order("-CTime").
 		Limit(25).
-		GetAll(ctx, questions)
+		GetAll(ctx, &questions)
 	if err != nil {
 		return nil, err
 	}

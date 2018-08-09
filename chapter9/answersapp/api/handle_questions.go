@@ -12,7 +12,7 @@ func handleQuestions(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		handleQuestionCreate(w, r)
 	case "GET":
-		params := pathParams(r, "/api/question/:id")
+		params := pathParams(r, "/api/questions/:id")
 		questionId, ok := params[":id"]
 		if ok { // GET /api/questions/ID
 			handleQuestionGet(w, r, questionId)
