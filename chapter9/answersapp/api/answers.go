@@ -63,7 +63,7 @@ func GetAnswer(ctx context.Context, answerKey *datastore.Key) (*Answer, error) {
 		return nil, err
 	}
 	answer.Key = answerKey
-	return nil, nil
+	return &answer, nil
 }
 
 func (a *Answer) Put(ctx context.Context) error {
