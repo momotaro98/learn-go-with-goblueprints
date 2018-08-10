@@ -133,3 +133,17 @@ This is a repo for my learning Golang.
 * How to ensure data integrity and build counters using transactions
 * Why maintaining a good line of sight in code helps improve maintainability
 * How to achieve simple HTTP routing without adding a dependency to a third-party package
+
+# Chapter 10. Micro-services in Go with the Go kit Framework
+
+> Specifically, in this chapter, you will learn:
+
+* How to hand code a micro-service using Go kit
+* What gRPC is and how to use it to build servers and clients
+* How to use Google's protocol buffers and associated tools to describe services and communicate in a highly efficient binary format
+* How endpoints in Go kit allow us to write a single service implementation and have it exposed via multiple transport protocols
+* How Go kits-included subpackages help us solve lots of common problems
+* How Middleware lets us wrap endpoints to adapt their behavior without touching the implementation itself
+* How to describe method calls as requests and response messages
+* How to rate limit our services to protect from surges in traffic
+* A few other idiomatic Go tips and tricks
