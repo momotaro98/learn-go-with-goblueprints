@@ -1,11 +1,13 @@
 package vault
 
 import (
-	"github.com/go-kit/kit/endpoint"
-	"golang.org/x/net/context"
-	"golang.org/x/crypto/bcrypt"
-	"net/http"
 	"encoding/json"
+	"errors"
+	"net/http"
+
+	"github.com/go-kit/kit/endpoint"
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/net/context"
 )
 
 // Service provides password hashing capabilities.
@@ -19,7 +21,7 @@ func NewService() Service {
 	return vaultService{}
 }
 
-type vaultService struct {}
+type vaultService struct{}
 
 func (vaultService) Hash(ctx context.Context, password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -93,7 +95,7 @@ func MakeHashEndpoint(srv Service) endpoint.Endpoint {
 }
 
 func MakeValidateEndpoint(srv Service) endpoint.Endpoint {
-	return func (ctx context.Context, request interface{}) (interface{}, error) {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(validateRequest)
 		v, err := srv.Validate(ctx, req.Password, req.Hash)
 		if err != nil {
@@ -101,4 +103,39 @@ func MakeValidateEndpoint(srv Service) endpoint.Endpoint {
 		}
 		return validateResponse{v, ""}, nil
 	}
+}
+
+// Endpoints represents all endpoints for the vault Service.
+type Endpoints struct {
+	HashEndpoint     endpoint.Endpoint
+	ValidateEndpoint endpoint.Endpoint
+}
+
+// Hash uses the HashEndpoint to hash a password.
+func (e Endpoints) Hash(ctx context.Context, password string) (string, error) {
+	req := hashRequest{Password: password}
+	resp, err := e.HashEndpoint(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	hashResp := resp.(hashResponse)
+	if hashResp.Err != "" {
+		return "", errors.New(hashResp.Err)
+	}
+	return hashResp.Hash, nil
+}
+
+// Validate uses the ValidateEndpoint to validate a password and hash pair.
+func (e Endpoints) Validate(ctx context.Context, password,
+	hash string) (bool, error) {
+	req := validateRequest{Password: password, Hash: hash}
+	resp, err := e.ValidateEndpoint(ctx, req)
+	if err != nil {
+		return false, err
+	}
+	validateResp := resp.(validateResponse)
+	if validateResp.Err != "" {
+		return false, errors.New(validateResp.Err)
+	}
+	return validateResp.Valid, nil
 }
