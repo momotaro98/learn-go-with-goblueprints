@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
+	"os"
 	"time"
 
 	//"github.com/momotaro98/learn-go-with-goblueprints/chapter10-11/vault"
+	"github.com/momotaro98/learn-go-with-goblueprints/chapter10-11/vault"
 	grpcclient "github.com/momotaro98/learn-go-with-goblueprints/chapter10-11/vault/client/grpc"
 	"google.golang.org/grpc"
-	"github.com/momotaro98/learn-go-with-goblueprints/chapter10-11/vault"
 )
 
 /*
@@ -49,9 +51,23 @@ func main() {
 }
 
 func hash(ctx context.Context, service vault.Service, password string) {
+	h, err := service.Hash(ctx, password)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	fmt.Println(h)
 }
 
-func validate(ctx context.Context, service vault.Service, password string, hash string) {
+func validate(ctx context.Context, service vault.Service, password, hash string) {
+	valid, err := service.Validate(ctx, password, hash)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	if !valid {
+		fmt.Println("invalid")
+		os.Exit(1)
+	}
+	fmt.Println("valid")
 }
 
 func pop(s []string) (string, []string) {
